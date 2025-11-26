@@ -4,7 +4,6 @@ import { Link } from 'react-scroll';
 import { motion, type Variants } from 'framer-motion';
 import { gsap } from 'gsap';
 
-// Define the type for the Framer Motion variants for better type safety
 const menuVariants: Variants = {
     open: {
         x: 0,
@@ -23,10 +22,7 @@ const menuVariants: Variants = {
 };
 
 const Header: FC = () => {
-    // TypeScript automatically infers the type of 'nav' as boolean
     const [nav, setNav] = useState(false);
-    
-    // Create a ref for the GSAP animation target
     const jaymiRef = useRef<HTMLAnchorElement>(null); 
 
     const toggleNav = () => {
@@ -53,25 +49,35 @@ const Header: FC = () => {
         return () => ctx.revert();
     }, []);
 
-    // Define the color transition class for all components
     const transitionClass = 'transition-colors duration-500';
 
-    // --- Component JSX ---
     return (
-        // 1. Apply theme-aware background/text colors and smooth transition
+        // 🚨 INVERSE THEME LOGIC APPLIED HERE 🚨
+        // Light Mode (<html> has NO 'dark' class): Use dark colors for the header
+        // Dark Mode (<html> HAS 'dark' class): Use light colors for the header (the 'dark:' prefix will apply the light colors)
         <div className={`fixed top-0 left-0 w-full z-50 
-            bg-bg-light bg-opacity-80 backdrop-blur-md 
-            dark:bg-bg-dark dark:bg-opacity-80
+            
+            // 1. DEFAULT (Light Page): Header is DARK
+            bg-bg-dark bg-opacity-80 backdrop-blur-md 
+            
+            // 2. DARK MODE OVERRIDE (Dark Page): Header is LIGHT
+            dark:bg-bg-light dark:bg-opacity-80
+            
             ${transitionClass}`}
         >
             <div className={`max-w-[1300px] mx-auto flex justify-between 
             text-xl items-center px-12 h-20 
-            text-text-light dark:text-text-dark`} // 2. Apply theme-aware text colors
+            
+            // 3. DEFAULT (Light Page): Text is LIGHT (dark background)
+            text-text-dark 
+            
+            // 4. DARK MODE OVERRIDE (Dark Page): Text is DARK (light background)
+            dark:text-text-light`} 
             >
-                {/* Apply ref for GSAP animation & primary-accent color */}
                 <a 
                     href="#" 
                     ref={jaymiRef} 
+                    // Accent color stays constant for contrast in both modes
                     className={`text-3xl font-bold cursor-pointer text-primary-accent ${transitionClass}`}
                 >
                     Jaymi
@@ -85,7 +91,7 @@ const Header: FC = () => {
                 </ul>
 
                 {/* Theme-aware menu icons */}
-                <div onClick={toggleNav} className={`md:hidden z-50 text-text-light dark:text-text-dark ${transitionClass}`}>
+                <div onClick={toggleNav} className={`md:hidden z-50 text-text-dark dark:text-text-light ${transitionClass}`}>
                     {nav ? <AiOutlineClose size={30} /> : <AiOutlineMenu size={30} />}
                 </div>
 
@@ -93,9 +99,9 @@ const Header: FC = () => {
                     initial={false}
                     animate={nav ? 'open' : 'closed'}
                     variants={menuVariants}
-                    // Use theme colors for the mobile menu background
+                    // Mobile menu background flips with the header's primary background
                     className={`fixed left-0 top-0 w-full min-h-screen z-40 ${transitionClass}
-                        bg-bg-light/95 dark:bg-bg-dark/95`} // Use a slightly higher opacity for mobile menu
+                        bg-bg-dark/95 dark:bg-bg-light/95`} 
                 >
                     <ul className='font-semibold text-2xl space-y-8 mt-24 text-center '>
                         <li><Link to="about" onClick={closeNav} smooth={true} offset={-80} duration={500}>About</Link></li>
